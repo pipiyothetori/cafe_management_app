@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>商品登録</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>商品登録</h1>
+      <p>新しい商品を追加します</p>
+    </div>
+
+    <div class="card">
+      <form action="" method="post">
+        <label>商品名：</label>
+        <input type="text" name="name" required>
+
+        <label>単位（例：kg, 個, 袋）：</label>
+        <input type="text" name="unit" required>
+
+        <label>カテゴリ：</label>
+        <select name="category_id" required>
+          {% for c in categories %}
+            <option value="{{ c.id }}">{{ c.name }}</option>
+          {% endfor %}
+        </select>
+
+        <label>在庫アラート閾値：</label>
+        <input type="number" name="alert_threshold" value="0">
+
+        <label>メモ：</label>
+        <textarea name="note"></textarea>
+
+        <button type="submit">登録する</button>
+      </form>
+    </div>
+
+    <p><a class="small-link" href="{{ url_for('item_list') }}">一覧へ戻る</a></p>
+  </div>
+</body>
+</html>

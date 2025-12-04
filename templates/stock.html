@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>入出庫登録 - 喫茶店在庫管理アプリ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+
+        <div class="header">
+            <h1>入出庫 登録</h1>
+            <p>商品を選んで数量を入力してください</p>
+        </div>
+
+        <div class="nav-grid">
+            <a href="{{ url_for('index') }}" class="nav-link">TOPページに戻る</a>
+            <a href="{{ url_for('item_list') }}" class="nav-link">商品一覧を見る</a>
+        </div>
+
+        <div class="card">
+            <form method="POST" action="{{ url_for('stock') }}">
+                <label>商品：</label>
+                <select name="item_id" required>
+                    {% for item in items %}
+                        <option value="{{ item.id }}">{{ item.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <label>数量：</label>
+                <input type="number" name="quantity" min="1" required>
+
+                <label>メモ：</label>
+                <input type="text" name="memo">
+
+                <button type="submit" name="action" value="in">入庫</button>
+                <button type="submit" name="action" value="out">出庫</button>
+            </form>
+        </div>
+
+    </div>
+</body>
+</html>

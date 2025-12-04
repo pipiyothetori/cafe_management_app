@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>喫茶店在庫管理アプリ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>喫茶店在庫管理アプリ</h1>
+      <p>操作したいページを選んでください</p>
+    </div>
+
+```
+<div class="nav-grid">
+  <a href="{{ url_for('add_item') }}" class="nav-link">商品登録</a>
+  <a href="{{ url_for('item_list') }}" class="nav-link">商品一覧</a>
+  <a href="{{ url_for('stock') }}" class="nav-link">入出庫登録</a>
+  <a href="{{ url_for('stock_list') }}" class="nav-link">入出庫一覧</a>
+</div>
+```
+
+  </div>
+</body>
+</html>

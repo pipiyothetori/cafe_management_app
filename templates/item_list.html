@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>商品一覧</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>商品一覧</h1>
+      <p>登録されている商品を一覧できます</p>
+    </div>
+
+    <p>
+      <a class="nav-link" href="{{ url_for('add_item') }}">＋ 商品を追加する</a>
+    </p>
+
+    <div class="card table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>商品名</th>
+            <th>カテゴリ</th>
+            <th>単位</th>
+            <th>在庫数</th>
+            <th>アラート閾値</th>
+            <th>メモ</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+          <tr>
+            <td>{{ item.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.category_name }}</td>
+            <td>{{ item.unit }}</td>
+            <td>
+              {% set stock = stock_dict[item.id] %}
+              {% if stock <= item.alert_threshold %}
+                <span class="badge badge-danger">{{ stock }}</span>
+              {% else %}
+                {{ stock }}
+              {% endif %}
+            </td>
+            <td>{{ item.alert_threshold }}</td>
+            <td>{{ item.note }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="nav-grid">
+      <a href="{{ url_for('index') }}" class="nav-link">TOPに戻る</a>
+      <a href="{{ url_for('stock') }}" class="nav-link">入出庫登録</a>
+      <a href="{{ url_for('stock_list') }}" class="nav-link">入出庫一覧</a>
+    </div>
+  </div>
+</body>
+</html>

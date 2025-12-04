@@ -1,0 +1,140 @@
+/* static/style.css */
+
+/* --- 基本 --- */
+:root{
+  --primary:#6b4f4f;
+  --primary-weak:#a37474;
+  --bg:#fbfaf9;
+  --card-bg:#ffffff;
+  --muted:#666;
+  --accent:#4CAF50;
+}
+
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  padding:0;
+  height:100%;
+  background:var(--bg);
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  color:#222;
+}
+
+/* ページの中央コンテナ */
+.container{
+  max-width:1000px;
+  margin:28px auto;
+  padding:20px;
+}
+
+/* --- ヘッダー --- */
+.header{
+  text-align:center;
+  margin-bottom:18px;
+}
+.header h1{
+  margin:0;
+  color:var(--primary);
+  font-size:1.8rem;
+  letter-spacing:0.6px;
+}
+.header p {
+  margin:6px 0 0;
+  color:var(--muted);
+}
+
+/* --- ボタン風リンク --- */
+.nav-grid{
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin:16px 0 28px;
+}
+.nav-link{
+  display:inline-block;
+  padding:12px 20px;
+  min-width:180px;
+  text-align:center;
+  background:var(--primary);
+  color:#fff;
+  text-decoration:none;
+  border-radius:8px;
+  font-weight:700;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  transition:all .18s ease;
+}
+.nav-link:hover{ background:var(--primary-weak); transform:translateY(-2px); }
+
+/* --- カード風 UI --- */
+.card{
+  background:var(--card-bg);
+  border-radius:10px;
+  padding:18px;
+  box-shadow:0 6px 18px rgba(16,16,16,0.05);
+  margin-bottom:18px;
+}
+
+/* --- フォーム系 --- */
+form label{ display:block; margin-bottom:6px; color:var(--muted); font-weight:600; }
+input[type="text"], input[type="number"], select, textarea{
+  width:100%;
+  padding:10px 12px;
+  margin-bottom:12px;
+  border:1px solid #e3e3e3;
+  border-radius:6px;
+  background:#fff;
+  font-size:0.95rem;
+}
+textarea{ min-height:80px; resize:vertical; }
+
+button[type="submit"], .btn {
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  padding:10px 16px;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:700;
+}
+button[type="submit"]:hover, .btn:hover{ filter:brightness(.95) }
+
+/* --- テーブル（一覧） --- */
+.table-wrap{ overflow-x:auto; }
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:var(--card-bg);
+}
+th, td{
+  padding:10px 12px;
+  border-bottom:1px solid #f0f0f0;
+  text-align:left;
+}
+th{
+  background:#fafafa;
+  font-weight:700;
+}
+tr:nth-child(even) td{ background:#fff; }
+tr:nth-child(odd) td{ background:#fcfcfc; }
+
+/* --- アラート表示用（後で使える） --- */
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:0.85rem;
+}
+.badge-danger{ background:#ff6b6b; color:#fff; }
+.badge-warn{ background:#ffb74d; color:#3a2b00; }
+
+/* 小さめリンク */
+.small-link{ color:var(--primary); text-decoration:none; font-weight:600; }
+.small-link:hover{ text-decoration:underline; }
+
+/* レスポンシブ */
+@media (max-width:600px){
+  .nav-grid{ flex-direction:column; align-items:center; }
+  .container{ padding:12px; }
+}
