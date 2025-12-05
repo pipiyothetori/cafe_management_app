@@ -27,6 +27,7 @@
             <th>在庫数</th>
             <th>アラート閾値</th>
             <th>メモ</th>
+            <th>操作</th>
           </tr>
         </thead>
         <tbody>
@@ -46,6 +47,20 @@
             </td>
             <td>{{ item.alert_threshold }}</td>
             <td>{{ item.note }}</td>
+            <td>
+              <a href="{{ url_for('edit_item', item_id=item.id) }}">編集</a>
+
+              <!-- 論理削除（is_deleted = 1 にする） -->
+              <form action="{{ url_for('delete_item', item_id=item.id) }}"
+                    method="POST"
+                    style="display:inline;"
+                    onsubmit="return confirm('本当に削除しますか？');">
+                <button type="submit"
+                        style="color:red; background:none; border:none; cursor:pointer;">
+                  削除
+                </button>
+              </form>
+            </td>
           </tr>
         {% endfor %}
         </tbody>

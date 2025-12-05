@@ -48,7 +48,7 @@ def add_item():
 def item_list():
     conn = get_db_connection()
 
-    # 商品一覧（カテゴリ名つき）
+    # 商品一覧（削除されていない商品だけ）
     items = conn.execute("""
         SELECT items.id,
                items.name,
@@ -58,10 +58,11 @@ def item_list():
                items.note
         FROM items
         JOIN categories ON items.category_id = categories.id
+        WHERE items.is_deleted = 0
         ORDER BY items.id ASC
     """).fetchall()
 
-    # 在庫計算（stock_logsのSUM(change)で現在の在庫数を取得）
+    # 在庫計算
     stock_dict = {}
     for item in items:
         stock = conn.execute("""
@@ -73,6 +74,53 @@ def item_list():
 
     conn.close()
     return render_template("item_list.html", items=items, stock_dict=stock_dict)
+
+# ===== 商品編集ページ（GET） =====
+@app.route("/items/edit/<int:item_id>")
+def edit_item(item_id):
+    conn = get_db_connection()
+
+    item = conn.execute("""
+        SELECT items.id,
+               items.name,
+               items.unit,
+               items.category_id,
+               items.alert_threshold,
+               items.note,
+               categories.name AS category_name
+        FROM items
+        JOIN categories ON items.category_id = categories.id
+        WHERE items.id = ?
+    """, (item_id,)).fetchone()
+
+    categories = conn.execute("SELECT id, name FROM categories").fetchall()
+    conn.close()
+
+    if item is None:
+        return "商品が見つかりませんでした", 404
+
+    return render_template("edit_item.html", item=item, categories=categories)
+
+# ===== 商品編集（POSTで更新） =====
+@app.route("/items/edit/<int:item_id>", methods=["POST"])
+def update_item(item_id):
+    name = request.form["name"]
+    unit = request.form["unit"]
+    category_id = request.form["category_id"]
+    alert_threshold = request.form["alert_threshold"]
+    note = request.form["note"]
+
+    conn = get_db_connection()
+    conn.execute("""
+        UPDATE items
+        SET name = ?, unit = ?, category_id = ?, alert_threshold = ?, note = ?
+        WHERE id = ?
+    """, (name, unit, category_id, alert_threshold, note, item_id))
+
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for("item_list"))
 
 # ===== 入出庫登録ページ =====
 @app.route("/stock", methods=["GET", "POST"])
@@ -97,7 +145,7 @@ def stock():
 
         return redirect(url_for("stock"))
 
-    items = conn.execute("SELECT id, name FROM items").fetchall()
+    items = conn.execute("SELECT id, name FROM items WHERE is_deleted = 0").fetchall()
     conn.close()
 
     return render_template("stock.html", items=items)
@@ -121,6 +169,23 @@ def stock_list():
     conn.close()
 
     return render_template("stock_list.html", logs=logs)
+
+# ===== 商品削除（論理削除） =====
+@app.route("/items/delete/<int:item_id>", methods=["POST"])
+def delete_item(item_id):
+    conn = get_db_connection()
+
+    item = conn.execute("SELECT id FROM items WHERE id = ?", (item_id,)).fetchone()
+    if item is None:
+        conn.close()
+        return "商品が見つかりませんでした", 404
+
+    # 論理削除
+    conn.execute("UPDATE items SET is_deleted = 1 WHERE id = ?", (item_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for("item_list"))
 
 if __name__ == "__main__":
     app.run(debug=True)

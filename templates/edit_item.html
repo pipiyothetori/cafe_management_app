@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>商品編集</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>商品編集</h1>
+      <p>商品情報を修正できます</p>
+    </div>
+
+    <div class="card">
+      <form action="{{ url_for('update_item', item_id=item.id) }}" method="POST">
+
+        <label>商品名</label>
+        <input type="text" name="name" value="{{ item.name }}" required>
+
+        <label>カテゴリ</label>
+        <select name="category_id" required>
+          {% for c in categories %}
+            <option value="{{ c.id }}" {% if c.id == item.category_id %}selected{% endif %}>
+              {{ c.name }}
+            </option>
+          {% endfor %}
+        </select>
+
+        <label>単位</label>
+        <input type="text" name="unit" value="{{ item.unit }}">
+
+        <label>アラート閾値</label>
+        <input type="number" name="alert_threshold" value="{{ item.alert_threshold }}" required>
+
+        <label>メモ</label>
+        <textarea name="note">{{ item.note }}</textarea>
+
+        <button type="submit" class="btn-primary">更新する</button>
+      </form>
+    </div>
+
+    <div class="nav-grid">
+      <a href="{{ url_for('item_list') }}" class="nav-link">商品一覧に戻る</a>
+      <a href="{{ url_for('index') }}" class="nav-link">TOPに戻る</a>
+    </div>
+  </div>
+</body>
+</html>
