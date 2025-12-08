@@ -48,7 +48,6 @@ def add_item():
 def item_list():
     conn = get_db_connection()
 
-    # 商品一覧（削除されていない商品だけ）
     items = conn.execute("""
         SELECT items.id,
                items.name,
@@ -62,7 +61,6 @@ def item_list():
         ORDER BY items.id ASC
     """).fetchall()
 
-    # 在庫計算
     stock_dict = {}
     for item in items:
         stock = conn.execute("""
@@ -150,7 +148,7 @@ def stock():
 
     return render_template("stock.html", items=items)
 
-# ===== 入出庫一覧ページ =====
+# ===== 入出庫一覧ページ（編集＆削除付き） =====
 @app.route("/stock/list")
 def stock_list():
     conn = get_db_connection()
@@ -164,11 +162,67 @@ def stock_list():
         FROM stock_logs sl
         JOIN items i ON sl.item_id = i.id
         JOIN users u ON sl.user_id = u.id
+        WHERE sl.is_deleted = 0
         ORDER BY sl.timestamp DESC
     """).fetchall()
     conn.close()
 
     return render_template("stock_list.html", logs=logs)
+
+# ===== 入出庫 編集ページ（GET） =====
+@app.route("/stock/edit/<int:log_id>")
+def edit_stock(log_id):
+    conn = get_db_connection()
+
+    log = conn.execute("""
+        SELECT *
+        FROM stock_logs
+        WHERE id = ? AND is_deleted = 0
+    """, (log_id,)).fetchone()
+
+    items = conn.execute("SELECT id, name FROM items WHERE is_deleted = 0").fetchall()
+    users = conn.execute("SELECT id, username FROM users").fetchall()
+
+    conn.close()
+
+    if log is None:
+        return "データが見つかりませんでした", 404
+
+    return render_template("edit_stock.html", log=log, items=items, users=users)
+
+# ===== 入出庫 更新（POST） =====
+@app.route("/stock/edit/<int:log_id>", methods=["POST"])
+def update_stock(log_id):
+    item_id = request.form["item_id"]
+    user_id = request.form["user_id"]
+    change = request.form["change"]
+    memo = request.form["memo"]
+
+    conn = get_db_connection()
+    conn.execute("""
+        UPDATE stock_logs
+        SET item_id = ?, user_id = ?, change = ?, memo = ?
+        WHERE id = ?
+    """, (item_id, user_id, change, memo, log_id))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for("stock_list"))
+
+# ===== 入出庫 削除（論理削除） =====
+@app.route("/stock/delete/<int:log_id>", methods=["POST"])
+def delete_stock(log_id):
+    conn = get_db_connection()
+
+    conn.execute("""
+        UPDATE stock_logs
+        SET is_deleted = 1
+        WHERE id = ?
+    """, (log_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for("stock_list"))
 
 # ===== 商品削除（論理削除） =====
 @app.route("/items/delete/<int:item_id>", methods=["POST"])
@@ -180,7 +234,6 @@ def delete_item(item_id):
         conn.close()
         return "商品が見つかりませんでした", 404
 
-    # 論理削除
     conn.execute("UPDATE items SET is_deleted = 1 WHERE id = ?", (item_id,))
     conn.commit()
     conn.close()
